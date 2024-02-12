@@ -1,5 +1,5 @@
 import http from 'http';
-import { getAllUsers, getUserById } from './services/user-service';
+import { getAllUsers, getUserById, createUser } from './services/user-service';
 
 const PORT = process.env.PORT || 3000;
 
@@ -20,6 +20,15 @@ const server = http.createServer((req, res) => {
         getAllUsers(req, res);
       } else {
         notFound(res);
+      }
+      break;
+    case 'POST':
+      switch (pathname) {
+        case '/api/users':
+          createUser(req, res);
+          break;
+        default:
+          notFound(res);
       }
       break;
     default:

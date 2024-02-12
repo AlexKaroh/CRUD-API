@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { IncomingMessage, ServerResponse } from 'http';
 import { User } from '@src/models/user.model';
 
@@ -32,4 +33,45 @@ export const getUserById = (_: IncomingMessage, res: ServerResponse, userId: str
 
   res.writeHead(200, CONTENT_TYPE);
   res.end(JSON.stringify(user));
+};
+
+export const createUser = (req: IncomingMessage, res: ServerResponse) => {
+  let body = '';
+  req.on('data', (chunk) => {
+    body += chunk.toString();
+  });
+
+  req.on('end', () => {
+    const { username, age, hobbies } = JSON.parse(body);
+
+    if (!username) {
+      res.writeHead(400, CONTENT_TYPE);
+      res.end(JSON.stringify({ message: 'Username field is required' }));
+      return;
+    }
+
+    if (!age) {
+      res.writeHead(400, CONTENT_TYPE);
+      res.end(JSON.stringify({ message: 'Age field is required' }));
+      return;
+    }
+
+    if (!hobbies) {
+      res.writeHead(400, CONTENT_TYPE);
+      res.end(JSON.stringify({ message: 'Hobbies field is required' }));
+      return;
+    }
+
+    const newUser: User = {
+      id: uuidv4(),
+      username,
+      age,
+      hobbies: Array.isArray(hobbies) ? hobbies : [],
+    };
+
+    users.push(newUser);
+
+    res.writeHead(201, CONTENT_TYPE);
+    res.end(JSON.stringify(newUser));
+  });
 };
