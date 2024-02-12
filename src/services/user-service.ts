@@ -75,3 +75,52 @@ export const createUser = (req: IncomingMessage, res: ServerResponse) => {
     res.end(JSON.stringify(newUser));
   });
 };
+
+export const updateUserById = (req: IncomingMessage, res: ServerResponse, userId: string) => {
+  let body = '';
+
+  if (!isValidUUID(userId)) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ message: 'Invalid userId. Please provide a valid UUID.' }));
+    return;
+  }
+
+  req.on('data', (chunk) => {
+    body += chunk.toString();
+  });
+
+  req.on('end', () => {
+    const { username, age, hobbies } = JSON.parse(body);
+
+    if (!username) {
+      res.writeHead(400, CONTENT_TYPE);
+      res.end(JSON.stringify({ message: 'Username field is required' }));
+      return;
+    }
+
+    if (!age) {
+      res.writeHead(400, CONTENT_TYPE);
+      res.end(JSON.stringify({ message: 'Age field is required' }));
+      return;
+    }
+
+    if (!hobbies) {
+      res.writeHead(400, CONTENT_TYPE);
+      res.end(JSON.stringify({ message: 'Hobbies field is required' }));
+      return;
+    }
+
+    const userIndex = users.findIndex((user) => user.id === userId);
+
+    if (userIndex === -1) {
+      res.writeHead(404, CONTENT_TYPE);
+      res.end(JSON.stringify({ message: 'User not found' }));
+      return;
+    }
+
+    users[userIndex] = { ...users[userIndex], username, age, hobbies };
+
+    res.writeHead(200, CONTENT_TYPE);
+    res.end(JSON.stringify(users[userIndex]));
+  });
+};
