@@ -124,3 +124,24 @@ export const updateUserById = (req: IncomingMessage, res: ServerResponse, userId
     res.end(JSON.stringify(users[userIndex]));
   });
 };
+
+export const deleteUserById = (_: IncomingMessage, res: ServerResponse, userId: string) => {
+  const userIndex = users.findIndex((user) => user.id === userId);
+
+  if (!isValidUUID(userId)) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ message: 'Invalid userId. Please provide a valid UUID.' }));
+    return;
+  }
+
+  if (userIndex === -1) {
+    res.writeHead(404, CONTENT_TYPE);
+    res.end(JSON.stringify({ message: 'User not found' }));
+    return;
+  }
+
+  users.splice(userIndex, 1);
+
+  res.writeHead(204);
+  res.end();
+};

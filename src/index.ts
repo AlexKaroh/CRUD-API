@@ -1,5 +1,5 @@
 import http from 'http';
-import { getAllUsers, getUserById, createUser, updateUserById } from './services/user-service';
+import { getAllUsers, getUserById, createUser, updateUserById, deleteUserById } from './services/user-service';
 
 const PORT = process.env.PORT || 3000;
 
@@ -34,6 +34,13 @@ const server = http.createServer((req, res) => {
     case 'PUT':
       if (userId && pathname.includes('/api/users')) {
         updateUserById(req, res, userId);
+      } else {
+        notFound(res);
+      }
+      break;
+    case 'DELETE':
+      if (userId && pathname.includes('/api/users')) {
+        deleteUserById(req, res, userId);
       } else {
         notFound(res);
       }
